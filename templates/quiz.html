@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz{% endblock %}
+
+{% block content %}
+<div class="quiz-page">
+    <div class="container">
+        <div id="quiz-loading" class="quiz-loading">
+            <div class="loading-spinner"></div>
+            <p>Generating your quiz...</p>
+        </div>
+
+        <div id="quiz-container" class="quiz-container" style="display:none;">
+            <header class="quiz-header">
+                <div class="quiz-progress">
+                    <span id="question-counter">Question 1 of 4</span>
+                    <div class="quiz-progress-bar">
+                        <div id="quiz-progress-fill" class="progress-fill" style="width: 25%"></div>
+                    </div>
+                </div>
+                <div class="quiz-score">
+                    Score: <span id="current-score">0</span>/<span id="total-questions">4</span>
+                </div>
+            </header>
+
+            <main class="quiz-main">
+                <div id="question-card" class="question-card">
+                    <div class="question-badge" id="concept-badge">Concept</div>
+                    <h2 id="question-text" class="question-text">Question text here</h2>
+
+                    <div id="options-container" class="options-container">
+                    </div>
+
+                    <div id="feedback-container" class="feedback-container" style="display:none;">
+                        <div id="feedback-status" class="feedback-status"></div>
+                        <p id="feedback-text" class="feedback-text"></p>
+                        <p id="understanding-text" class="understanding-text"></p>
+                    </div>
+                </div>
+
+                <div class="quiz-actions">
+                    <button id="submit-btn" class="btn btn-primary" disabled>
+                        Submit Answer
+                    </button>
+                    <button id="next-btn" class="btn btn-primary" style="display:none;">
+                        Next Question
+                        <span class="btn-icon">→</span>
+                    </button>
+                    <button id="finish-btn" class="btn btn-primary btn-large" style="display:none;">
+                        See Results
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <div id="quiz-error" class="quiz-error" style="display:none;">
+            <h2>Oops!</h2>
+            <p id="error-message">Something went wrong.</p>
+            <a href="/" class="btn btn-primary">Go Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+<script>
+const sessionId = "{{ session_id }}";
+initQuiz(sessionId);
+</script>
+{% endblock %}

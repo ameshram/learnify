@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div class="results-page">
+    <div class="container">
+        <div id="results-loading" class="results-loading">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your results...</p>
+        </div>
+
+        <div id="results-container" class="results-container" style="display:none;">
+            <header class="results-header">
+                <h1>Quiz Complete!</h1>
+                <p class="results-topic">{{ topic }}</p>
+            </header>
+
+            <div class="results-grid">
+                <div class="score-card">
+                    <div id="score-circle" class="score-circle">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="score-bg" cx="50" cy="50" r="45"></circle>
+                            <circle id="score-progress" class="score-progress" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="score-value">
+                            <span id="score-percentage">0</span>%
+                        </div>
+                    </div>
+                    <div class="score-details">
+                        <p><span id="score-correct">0</span> out of <span id="score-total">4</span> correct</p>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h2>Performance Analysis</h2>
+                    <div id="strengths" class="analysis-section">
+                        <h3>Strengths</h3>
+                        <ul id="strengths-list"></ul>
+                    </div>
+                    <div id="weaknesses" class="analysis-section">
+                        <h3>Areas to Review</h3>
+                        <ul id="weaknesses-list"></ul>
+                    </div>
+                    <div id="recommendations" class="analysis-section">
+                        <h3>Recommendations</h3>
+                        <ul id="recommendations-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-card">
+                <h2>AI Insights</h2>
+                <div id="insights-loading" class="insights-loading">
+                    <div class="loading-spinner-small"></div>
+                    <span>Generating personalized insights...</span>
+                </div>
+                <div id="insights-content" class="insights-content markdown-body" style="display:none;">
+                </div>
+            </div>
+
+            <div class="results-actions">
+                <a href="/" class="btn btn-secondary">
+                    Learn Something New
+                </a>
+                <a href="/history" class="btn btn-primary">
+                    View History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const sessionId = "{{ session_id }}";
+
+async function loadResults() {
+    try {
+        const response = await fetch(`/api/quiz/complete/${sessionId}`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        document.getElementById('results-loading').style.display = 'none';
+        document.getElementById('results-container').style.display = 'block';
+
+        const percentage = Math.round(data.percentage);
+        document.getElementById('score-percentage').textContent = percentage;
+        document.getElementById('score-correct').textContent = data.score;
+        document.getElementById('score-total').textContent = data.total;
+
+        const circumference = 2 * Math.PI * 45;
+        const offset = circumference - (percentage / 100) * circumference;
+        const progressCircle = document.getElementById('score-progress');
+        progressCircle.style.strokeDasharray = circumference;
+        progressCircle.style.strokeDashoffset = offset;
+
+        if (percentage >= 80) {
+            progressCircle.style.stroke = 'var(--success)';
+        } else if (percentage >= 60) {
+            progressCircle.style.stroke = 'var(--warning)';
+        } else {
+            progressCircle.style.stroke = 'var(--error)';
+        }
+
+        const analysis = data.analysis;
+        const strengthsList = document.getElementById('strengths-list');
+        analysis.strengths.forEach(s => {
+            const li = document.createElement('li');
+            li.textContent = s;
+            strengthsList.appendChild(li);
+        });
+
+        const weaknessesList = document.getElementById('weaknesses-list');
+        if (analysis.weaknesses.length === 0) {
+            document.getElementById('weaknesses').style.display = 'none';
+        } else {
+            analysis.weaknesses.forEach(w => {
+                const li = document.createElement('li');
+                li.textContent = w;
+                weaknessesList.appendChild(li);
+            });
+        }
+
+        const recommendationsList = document.getElementById('recommendations-list');
+        analysis.recommendations.forEach(r => {
+            const li = document.createElement('li');
+            li.textContent = r;
+            recommendationsList.appendChild(li);
+        });
+
+        loadInsights();
+    } catch (error) {
+        console.error('Error loading results:', error);
+    }
+}
+
+async function loadInsights() {
+    try {
+        const response = await fetch(`/api/insights/${sessionId}`);
+        const data = await response.json();
+
+        document.getElementById('insights-loading').style.display = 'none';
+        const insightsContent = document.getElementById('insights-content');
+        insightsContent.style.display = 'block';
+        insightsContent.innerHTML = marked.parse(data.insights);
+    } catch (error) {
+        document.getElementById('insights-loading').innerHTML =
+            '<p>Could not load insights.</p>';
+    }
+}
+
+loadResults();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %}

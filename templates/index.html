@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Learn Anything with AI</h1>
+        <p class="hero-subtitle">Get personalized teaching on any topic, test your knowledge with interactive quizzes, and track your learning progress.</p>
+    </div>
+</section>
+
+<section class="topic-section">
+    <div class="container">
+        <div class="topic-card">
+            <h2>What do you want to learn?</h2>
+            <form id="learn-form" class="learn-form">
+                <div class="form-group">
+                    <input type="text" id="topic-input" name="topic"
+                           placeholder="e.g., Machine Learning, Quantum Physics, Python async/await..."
+                           class="topic-input" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Difficulty Level</label>
+                    <div class="difficulty-options">
+                        <label class="difficulty-option">
+                            <input type="radio" name="difficulty" value="beginner">
+                            <span class="difficulty-label">Beginner</span>
+                            <span class="difficulty-desc">Simple explanations, lots of examples</span>
+                        </label>
+                        <label class="difficulty-option">
+                            <input type="radio" name="difficulty" value="intermediate" checked>
+                            <span class="difficulty-label">Intermediate</span>
+                            <span class="difficulty-desc">Balanced theory and practice</span>
+                        </label>
+                        <label class="difficulty-option">
+                            <input type="radio" name="difficulty" value="advanced">
+                            <span class="difficulty-label">Advanced</span>
+                            <span class="difficulty-desc">Deep technical details</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-text">Start Learning</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="container">
+        <h2 class="section-title">Your Learning Stats</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_sessions or 0 }}</div>
+                <div class="stat-label">Sessions Started</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.completed_sessions or 0 }}</div>
+                <div class="stat-label">Quizzes Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.average_score or 0 }}%</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.unique_topics or 0 }}</div>
+                <div class="stat-label">Topics Explored</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3>1. Choose a Topic</h3>
+                <p>Enter any topic you want to learn about, from programming to physics.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎓</div>
+                <h3>2. Get Taught</h3>
+                <p>AI explains the topic in real-time with clear examples and analogies.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>3. Take a Quiz</h3>
+                <p>Test your understanding with adaptive questions and instant feedback.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>4. Track Progress</h3>
+                <p>Review your learning journey and identify areas for improvement.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('learn-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const topic = document.getElementById('topic-input').value.trim();
+    const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+    if (topic) {
+        window.location.href = `/teach?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`;
+    }
+});
+</script>
+{% endblock %}

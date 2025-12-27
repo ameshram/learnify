@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Learning: {{ topic }}{% endblock %}
+
+{% block content %}
+<div class="teaching-page">
+    <header class="teaching-header">
+        <div class="container">
+            <div class="teaching-meta">
+                <span class="teaching-badge">{{ difficulty | capitalize }}</span>
+                <h1 class="teaching-title">{{ topic }}</h1>
+            </div>
+            <div class="teaching-actions">
+                <button id="restart-btn" class="btn btn-secondary" style="display:none;">
+                    Restart
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="teaching-container">
+        <div class="teaching-content-wrapper">
+            <div id="loading-indicator" class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <p>Preparing your lesson...</p>
+            </div>
+
+            <article id="teaching-content" class="teaching-content markdown-body">
+            </article>
+
+            <div id="teaching-complete" class="teaching-complete" style="display:none;">
+                <div class="complete-card">
+                    <h2>Ready to test your knowledge?</h2>
+                    <p>Take a quick quiz to reinforce what you've learned.</p>
+                    <a id="quiz-link" href="#" class="btn btn-primary btn-large">
+                        Take Quiz
+                        <span class="btn-icon">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <aside class="teaching-sidebar">
+            <div class="sidebar-card">
+                <h3>Topic Info</h3>
+                <dl class="info-list">
+                    <dt>Topic</dt>
+                    <dd>{{ topic }}</dd>
+                    <dt>Level</dt>
+                    <dd>{{ difficulty | capitalize }}</dd>
+                    <dt>Status</dt>
+                    <dd id="status-text">Loading...</dd>
+                </dl>
+            </div>
+            <div class="sidebar-card">
+                <h3>Progress</h3>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <p id="progress-text" class="progress-text">Starting...</p>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="{{ url_for('static', filename='js/streaming.js') }}"></script>
+<script>
+const topic = "{{ topic }}";
+const difficulty = "{{ difficulty }}";
+initTeaching(topic, difficulty);
+</script>
+{% endblock %}
