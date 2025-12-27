@@ -3,42 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Learnify{% endblock %} - AI Teaching Assistant</title>
+    <meta name="description" content="Learnify - AI-Powered Teaching Assistant. Learn any topic with personalized AI explanations and interactive quizzes.">
+    <title>{% block title %}Learnify{% endblock %} | AI Teaching Assistant</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="/" class="nav-brand">
-                <span class="brand-icon">📚</span>
-                <span class="brand-text">Learnify</span>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <!-- Logo -->
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i data-lucide="graduation-cap" style="width: 18px; height: 18px;"></i>
+                </div>
+                <span>Learnify</span>
             </a>
-            <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/history" class="nav-link">History</a>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon-light">☀️</span>
-                    <span class="theme-icon-dark">🌙</span>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Navigation Links (desktop) -->
+                <nav class="header-nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/history" class="nav-link">History</a>
+                </nav>
+
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <div class="theme-toggle-icons">
+                        <span>☀️</span>
+                        <span>🌙</span>
+                    </div>
+                    <div class="theme-toggle-thumb"></div>
                 </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="main-content">
+    <!-- Main Content -->
+    <main id="main-content">
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
-        <div class="footer-container">
-            <p>Powered by Claude AI</p>
+        <div class="container">
+            <p class="footer-text">Powered by Claude AI • Built with care</p>
         </div>
     </footer>
 
+    <!-- Toast Container for notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Core JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
     {% block scripts %}{% endblock %}
+
+    <!-- Initialize Lucide icons -->
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

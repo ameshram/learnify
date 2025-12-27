@@ -1,19 +1,20 @@
-/* Learnify - Streaming JavaScript */
+/**
+ * Learnify - Streaming JavaScript
+ *
+ * Handles real-time streaming of teaching content using Server-Sent Events (SSE)
+ */
 
 let sessionId = null;
 
 async function initTeaching(topic, difficulty) {
-    const loadingEl = document.getElementById('loading-indicator');
-    const contentEl = document.getElementById('teaching-content');
-    const completeEl = document.getElementById('teaching-complete');
-    const statusEl = document.getElementById('status-text');
+    const loadingState = document.getElementById('loading-state');
+    const contentArea = document.getElementById('content-area');
+    const teachingContent = document.getElementById('teaching-content');
+    const quizCta = document.getElementById('quiz-cta');
+    const quizLink = document.getElementById('quiz-link');
+    const statusText = document.getElementById('status-text');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
-    const quizLink = document.getElementById('quiz-link');
-    const restartBtn = document.getElementById('restart-btn');
-
-    statusEl.textContent = 'Generating...';
-    progressText.textContent = 'AI is thinking...';
 
     try {
         const response = await fetch('/api/teach', {
@@ -32,8 +33,10 @@ async function initTeaching(topic, difficulty) {
         let charCount = 0;
         const estimatedChars = 4000;
 
-        loadingEl.style.display = 'none';
-        contentEl.style.display = 'block';
+        // Show content area, hide loading
+        loadingState.classList.add('hidden');
+        contentArea.classList.remove('hidden');
+        progressText.textContent = 'Generating content...';
 
         while (true) {
             const { done, value } = await reader.read();
@@ -50,24 +53,40 @@ async function initTeaching(topic, difficulty) {
                         if (data.content) {
                             content += data.content;
                             charCount += data.content.length;
-                            contentEl.innerHTML = marked.parse(content);
 
+                            // Render markdown
+                            teachingContent.innerHTML = marked.parse(content);
+
+                            // Update progress
                             const progress = Math.min((charCount / estimatedChars) * 100, 95);
                             progressFill.style.width = progress + '%';
-                            progressText.textContent = 'Generating content...';
+
+                            // Scroll to keep new content visible
+                            teachingContent.scrollTop = teachingContent.scrollHeight;
                         }
 
                         if (data.done) {
                             sessionId = data.session_id;
+
+                            // Update UI
                             progressFill.style.width = '100%';
                             progressText.textContent = 'Complete!';
-                            statusEl.textContent = 'Complete';
+                            statusText.textContent = 'Complete';
+                            statusText.style.color = 'var(--color-success)';
 
+                            // Show quiz CTA
                             quizLink.href = `/quiz/${sessionId}`;
-                            completeEl.style.display = 'block';
-                            restartBtn.style.display = 'inline-flex';
+                            quizCta.classList.remove('hidden');
 
-                            contentEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            // Re-init icons
+                            if (window.lucide) {
+                                lucide.createIcons();
+                            }
+
+                            // Smooth scroll to quiz CTA
+                            setTimeout(() => {
+                                quizCta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 500);
                         }
 
                         if (data.error) {
@@ -83,22 +102,17 @@ async function initTeaching(topic, difficulty) {
         }
     } catch (error) {
         console.error('Teaching error:', error);
-        loadingEl.innerHTML = `
-            <div class="error-message">
-                <h3>Error</h3>
-                <p>${error.message}</p>
+
+        loadingState.innerHTML = `
+            <div style="text-align: center; padding: var(--space-8);">
+                <div style="font-size: 3rem; margin-bottom: var(--space-4);">😕</div>
+                <h3 style="margin-bottom: var(--space-2);">Something went wrong</h3>
+                <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);">${error.message}</p>
                 <a href="/" class="btn btn-primary">Try Again</a>
             </div>
         `;
+
+        statusText.textContent = 'Error';
+        statusText.style.color = 'var(--color-error)';
     }
 }
-
-// Restart button handler
-document.addEventListener('DOMContentLoaded', () => {
-    const restartBtn = document.getElementById('restart-btn');
-    if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-            window.location.reload();
-        });
-    }
-});

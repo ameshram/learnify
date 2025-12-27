@@ -1,70 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}Results{% endblock %}
+{% block title %}Quiz Results{% endblock %}
 
 {% block content %}
 <div class="results-page">
     <div class="container">
-        <div id="results-loading" class="results-loading">
-            <div class="loading-spinner"></div>
-            <p>Analyzing your results...</p>
+        <!-- Loading State -->
+        <div id="results-loading" class="loading-overlay">
+            <div class="spinner spinner-lg"></div>
+            <p class="loading-text">Analyzing your results...</p>
         </div>
 
-        <div id="results-container" class="results-container" style="display:none;">
-            <header class="results-header">
-                <h1>Quiz Complete!</h1>
+        <!-- Results Container (hidden initially) -->
+        <div id="results-container" class="results-container hidden">
+            <!-- Header -->
+            <header class="results-header animate-slide-up">
+                <h1 class="results-title">Quiz Complete!</h1>
                 <p class="results-topic">{{ topic }}</p>
             </header>
 
-            <div class="results-grid">
-                <div class="score-card">
-                    <div id="score-circle" class="score-circle">
-                        <svg viewBox="0 0 100 100">
-                            <circle class="score-bg" cx="50" cy="50" r="45"></circle>
-                            <circle id="score-progress" class="score-progress" cx="50" cy="50" r="45"></circle>
-                        </svg>
-                        <div class="score-value">
-                            <span id="score-percentage">0</span>%
-                        </div>
-                    </div>
-                    <div class="score-details">
-                        <p><span id="score-correct">0</span> out of <span id="score-total">4</span> correct</p>
-                    </div>
-                </div>
-
-                <div class="analysis-card">
-                    <h2>Performance Analysis</h2>
-                    <div id="strengths" class="analysis-section">
-                        <h3>Strengths</h3>
-                        <ul id="strengths-list"></ul>
-                    </div>
-                    <div id="weaknesses" class="analysis-section">
-                        <h3>Areas to Review</h3>
-                        <ul id="weaknesses-list"></ul>
-                    </div>
-                    <div id="recommendations" class="analysis-section">
-                        <h3>Recommendations</h3>
-                        <ul id="recommendations-list"></ul>
+            <!-- Score Display -->
+            <div class="score-display animate-scale-in">
+                <div class="score-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="score-circle-bg" cx="50" cy="50" r="42"></circle>
+                        <circle id="score-progress" class="score-circle-progress" cx="50" cy="50" r="42"
+                            stroke-dasharray="264" stroke-dashoffset="264"></circle>
+                    </svg>
+                    <div class="score-value">
+                        <div class="score-percentage"><span id="score-percent">0</span>%</div>
+                        <div class="score-label"><span id="score-correct">0</span>/<span id="score-total">4</span> correct</div>
                     </div>
                 </div>
             </div>
 
-            <div class="insights-card">
-                <h2>AI Insights</h2>
-                <div id="insights-loading" class="insights-loading">
-                    <div class="loading-spinner-small"></div>
+            <!-- Results Grid -->
+            <div class="results-grid">
+                <!-- Strengths -->
+                <div class="result-card animate-slide-up">
+                    <h3 class="result-card-title">
+                        <i data-lucide="check-circle" style="width: 18px; height: 18px; color: var(--color-success);"></i>
+                        <span>Strengths</span>
+                    </h3>
+                    <ul id="strengths-list" class="result-list">
+                        <!-- Generated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Areas to Review -->
+                <div class="result-card animate-slide-up" id="weaknesses-card">
+                    <h3 class="result-card-title">
+                        <i data-lucide="alert-circle" style="width: 18px; height: 18px; color: var(--color-warning);"></i>
+                        <span>Areas to Review</span>
+                    </h3>
+                    <ul id="weaknesses-list" class="result-list">
+                        <!-- Generated dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="result-card animate-slide-up mb-8">
+                <h3 class="result-card-title">
+                    <i data-lucide="lightbulb" style="width: 18px; height: 18px; color: var(--color-primary);"></i>
+                    <span>Recommendations</span>
+                </h3>
+                <ul id="recommendations-list" class="result-list">
+                    <!-- Generated dynamically -->
+                </ul>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="insights-card animate-slide-up">
+                <h2 class="insights-title">
+                    <i data-lucide="sparkles" style="width: 24px; height: 24px; color: var(--color-primary); display: inline; vertical-align: middle; margin-right: 8px;"></i>
+                    AI Insights
+                </h2>
+                <div id="insights-loading" class="flex items-center gap-4" style="color: var(--color-text-tertiary);">
+                    <div class="spinner"></div>
                     <span>Generating personalized insights...</span>
                 </div>
-                <div id="insights-content" class="insights-content markdown-body" style="display:none;">
-                </div>
+                <div id="insights-content" class="insights-content markdown-body hidden"></div>
             </div>
 
+            <!-- Actions -->
             <div class="results-actions">
-                <a href="/" class="btn btn-secondary">
-                    Learn Something New
+                <a href="/" class="btn btn-secondary btn-lg">
+                    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                    <span>Learn Something New</span>
                 </a>
-                <a href="/history" class="btn btn-primary">
-                    View History
+                <a href="/history" class="btn btn-primary btn-lg">
+                    <i data-lucide="history" style="width: 18px; height: 18px;"></i>
+                    <span>View History</span>
                 </a>
             </div>
         </div>
@@ -73,6 +100,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 const sessionId = "{{ session_id }}";
 
@@ -87,39 +115,56 @@ async function loadResults() {
             throw new Error(data.error);
         }
 
-        document.getElementById('results-loading').style.display = 'none';
-        document.getElementById('results-container').style.display = 'block';
+        // Hide loading, show results
+        document.getElementById('results-loading').classList.add('hidden');
+        document.getElementById('results-container').classList.remove('hidden');
 
+        // Update score
         const percentage = Math.round(data.percentage);
-        document.getElementById('score-percentage').textContent = percentage;
+        document.getElementById('score-percent').textContent = percentage;
         document.getElementById('score-correct').textContent = data.score;
         document.getElementById('score-total').textContent = data.total;
 
-        const circumference = 2 * Math.PI * 45;
+        // Animate score circle
+        const circumference = 2 * Math.PI * 42;
         const offset = circumference - (percentage / 100) * circumference;
         const progressCircle = document.getElementById('score-progress');
-        progressCircle.style.strokeDasharray = circumference;
-        progressCircle.style.strokeDashoffset = offset;
 
-        if (percentage >= 80) {
-            progressCircle.style.stroke = 'var(--success)';
-        } else if (percentage >= 60) {
-            progressCircle.style.stroke = 'var(--warning)';
+        setTimeout(() => {
+            progressCircle.style.strokeDashoffset = offset;
+
+            // Color based on score
+            if (percentage >= 80) {
+                progressCircle.classList.add('excellent');
+            } else if (percentage >= 60) {
+                progressCircle.classList.add('good');
+            } else {
+                progressCircle.classList.add('needs-work');
+            }
+        }, 100);
+
+        // Animate score number
+        animateValue('score-percent', 0, percentage, 1000);
+
+        // Populate analysis
+        const analysis = data.analysis;
+
+        // Strengths
+        const strengthsList = document.getElementById('strengths-list');
+        if (analysis.strengths.length === 0) {
+            strengthsList.innerHTML = '<li>Keep practicing to build your strengths!</li>';
         } else {
-            progressCircle.style.stroke = 'var(--error)';
+            analysis.strengths.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                strengthsList.appendChild(li);
+            });
         }
 
-        const analysis = data.analysis;
-        const strengthsList = document.getElementById('strengths-list');
-        analysis.strengths.forEach(s => {
-            const li = document.createElement('li');
-            li.textContent = s;
-            strengthsList.appendChild(li);
-        });
-
+        // Weaknesses
         const weaknessesList = document.getElementById('weaknesses-list');
         if (analysis.weaknesses.length === 0) {
-            document.getElementById('weaknesses').style.display = 'none';
+            document.getElementById('weaknesses-card').style.display = 'none';
         } else {
             analysis.weaknesses.forEach(w => {
                 const li = document.createElement('li');
@@ -128,6 +173,7 @@ async function loadResults() {
             });
         }
 
+        // Recommendations
         const recommendationsList = document.getElementById('recommendations-list');
         analysis.recommendations.forEach(r => {
             const li = document.createElement('li');
@@ -135,9 +181,20 @@ async function loadResults() {
             recommendationsList.appendChild(li);
         });
 
+        // Re-init icons
+        lucide.createIcons();
+
+        // Load AI insights
         loadInsights();
     } catch (error) {
         console.error('Error loading results:', error);
+        document.getElementById('results-loading').innerHTML = `
+            <div class="error-content">
+                <h2>Error loading results</h2>
+                <p>${error.message}</p>
+                <a href="/" class="btn btn-primary mt-4">Go Home</a>
+            </div>
+        `;
     }
 }
 
@@ -146,17 +203,35 @@ async function loadInsights() {
         const response = await fetch(`/api/insights/${sessionId}`);
         const data = await response.json();
 
-        document.getElementById('insights-loading').style.display = 'none';
+        document.getElementById('insights-loading').classList.add('hidden');
         const insightsContent = document.getElementById('insights-content');
-        insightsContent.style.display = 'block';
+        insightsContent.classList.remove('hidden');
         insightsContent.innerHTML = marked.parse(data.insights);
     } catch (error) {
         document.getElementById('insights-loading').innerHTML =
-            '<p>Could not load insights.</p>';
+            '<p style="color: var(--color-text-tertiary);">Unable to load insights.</p>';
     }
+}
+
+function animateValue(id, start, end, duration) {
+    const obj = document.getElementById(id);
+    const range = end - start;
+    const startTime = performance.now();
+
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        obj.textContent = Math.round(start + range * easeOut);
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    requestAnimationFrame(update);
 }
 
 loadResults();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% endblock %}

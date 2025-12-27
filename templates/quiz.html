@@ -5,59 +5,70 @@
 {% block content %}
 <div class="quiz-page">
     <div class="container">
-        <div id="quiz-loading" class="quiz-loading">
-            <div class="loading-spinner"></div>
-            <p>Generating your quiz...</p>
+        <!-- Loading State -->
+        <div id="quiz-loading" class="loading-overlay">
+            <div class="spinner spinner-lg"></div>
+            <p class="loading-text">Generating your personalized quiz...</p>
         </div>
 
-        <div id="quiz-container" class="quiz-container" style="display:none;">
-            <header class="quiz-header">
+        <!-- Quiz Container (hidden initially) -->
+        <div id="quiz-container" class="quiz-container hidden">
+            <!-- Quiz Header -->
+            <div class="quiz-header">
                 <div class="quiz-progress">
-                    <span id="question-counter">Question 1 of 4</span>
-                    <div class="quiz-progress-bar">
-                        <div id="quiz-progress-fill" class="progress-fill" style="width: 25%"></div>
+                    <div id="progress-dots" class="progress-dots">
+                        <!-- Dots will be generated dynamically -->
                     </div>
                 </div>
                 <div class="quiz-score">
                     Score: <span id="current-score">0</span>/<span id="total-questions">4</span>
                 </div>
-            </header>
+            </div>
 
-            <main class="quiz-main">
-                <div id="question-card" class="question-card">
-                    <div class="question-badge" id="concept-badge">Concept</div>
-                    <h2 id="question-text" class="question-text">Question text here</h2>
+            <!-- Question Card -->
+            <div class="question-card animate-fade-in">
+                <p id="question-number" class="question-number">Question 1 of 4</p>
+                <h2 id="question-text" class="question-text">Loading question...</h2>
 
-                    <div id="options-container" class="options-container">
-                    </div>
-
-                    <div id="feedback-container" class="feedback-container" style="display:none;">
-                        <div id="feedback-status" class="feedback-status"></div>
-                        <p id="feedback-text" class="feedback-text"></p>
-                        <p id="understanding-text" class="understanding-text"></p>
-                    </div>
+                <!-- Options -->
+                <div id="options-list" class="options-list">
+                    <!-- Options will be generated dynamically -->
                 </div>
 
-                <div class="quiz-actions">
-                    <button id="submit-btn" class="btn btn-primary" disabled>
-                        Submit Answer
-                    </button>
-                    <button id="next-btn" class="btn btn-primary" style="display:none;">
-                        Next Question
-                        <span class="btn-icon">→</span>
-                    </button>
-                    <button id="finish-btn" class="btn btn-primary btn-large" style="display:none;">
-                        See Results
-                        <span class="btn-icon">→</span>
-                    </button>
+                <!-- Feedback (hidden initially) -->
+                <div id="feedback-card" class="feedback-card hidden">
+                    <div class="feedback-header">
+                        <i id="feedback-icon" data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
+                        <span id="feedback-status">Correct!</span>
+                    </div>
+                    <p id="feedback-text" class="feedback-text"></p>
                 </div>
-            </main>
+            </div>
+
+            <!-- Quiz Actions -->
+            <div class="quiz-actions">
+                <button id="submit-btn" class="btn btn-primary btn-lg" disabled>
+                    <span>Submit Answer</span>
+                </button>
+                <button id="next-btn" class="btn btn-primary btn-lg hidden">
+                    <span>Next Question</span>
+                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                </button>
+                <button id="finish-btn" class="btn btn-accent btn-lg hidden">
+                    <span>See Results</span>
+                    <i data-lucide="trophy" style="width: 18px; height: 18px;"></i>
+                </button>
+            </div>
         </div>
 
-        <div id="quiz-error" class="quiz-error" style="display:none;">
-            <h2>Oops!</h2>
-            <p id="error-message">Something went wrong.</p>
-            <a href="/" class="btn btn-primary">Go Home</a>
+        <!-- Error State (hidden) -->
+        <div id="quiz-error" class="error-page hidden">
+            <div class="error-content">
+                <div class="error-code">!</div>
+                <h1 class="error-title">Something went wrong</h1>
+                <p id="error-message" class="error-description">Unable to load the quiz.</p>
+                <a href="/" class="btn btn-primary">Go Home</a>
+            </div>
         </div>
     </div>
 </div>

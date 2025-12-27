@@ -1,10 +1,20 @@
-/* Learnify - Quiz JavaScript */
+/**
+ * Learnify - Quiz JavaScript
+ *
+ * Handles quiz functionality:
+ * - Loading and displaying questions
+ * - Option selection
+ * - Answer submission
+ * - Progress tracking
+ * - Feedback display
+ */
 
 let questions = [];
 let currentIndex = 0;
 let score = 0;
 let selectedOption = null;
 let answered = false;
+let progressDots = [];
 
 async function initQuiz(sessionId) {
     const loadingEl = document.getElementById('quiz-loading');
@@ -23,16 +33,36 @@ async function initQuiz(sessionId) {
         }
 
         questions = data.questions;
-        loadingEl.style.display = 'none';
-        containerEl.style.display = 'block';
 
+        // Generate progress dots
+        const dotsContainer = document.getElementById('progress-dots');
+        dotsContainer.innerHTML = '';
+        questions.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+            dotsContainer.appendChild(dot);
+            progressDots.push(dot);
+        });
+
+        // Update total
         document.getElementById('total-questions').textContent = questions.length;
+
+        // Hide loading, show quiz
+        loadingEl.classList.add('hidden');
+        containerEl.classList.remove('hidden');
+
+        // Render first question
         renderQuestion();
         setupEventListeners(sessionId);
+
+        // Init icons
+        if (window.lucide) {
+            lucide.createIcons();
+        }
     } catch (error) {
         console.error('Quiz init error:', error);
-        loadingEl.style.display = 'none';
-        errorEl.style.display = 'block';
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
         document.getElementById('error-message').textContent = error.message;
     }
 }
@@ -40,52 +70,55 @@ async function initQuiz(sessionId) {
 function renderQuestion() {
     const question = questions[currentIndex];
 
-    document.getElementById('question-counter').textContent =
+    // Update question number
+    document.getElementById('question-number').textContent =
         `Question ${currentIndex + 1} of ${questions.length}`;
 
-    const progressPercent = ((currentIndex + 1) / questions.length) * 100;
-    document.getElementById('quiz-progress-fill').style.width = progressPercent + '%';
-
-    document.getElementById('concept-badge').textContent = question.concept_tested;
+    // Update question text
     document.getElementById('question-text').textContent = question.question;
 
-    const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = '';
+    // Render options
+    const optionsList = document.getElementById('options-list');
+    optionsList.innerHTML = '';
 
     question.options.forEach(option => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.dataset.optionId = option.id;
-        btn.innerHTML = `
-            <span class="option-id">${option.id}</span>
+        const optionCard = document.createElement('div');
+        optionCard.className = 'option-card';
+        optionCard.dataset.optionId = option.id;
+        optionCard.innerHTML = `
+            <span class="option-letter">${option.id}</span>
             <span class="option-text">${option.text}</span>
         `;
-        btn.addEventListener('click', () => selectOption(option.id));
-        optionsContainer.appendChild(btn);
+        optionCard.addEventListener('click', () => selectOption(option.id, optionCard));
+        optionsList.appendChild(optionCard);
     });
 
     // Reset state
     selectedOption = null;
     answered = false;
+
+    // Reset buttons
     document.getElementById('submit-btn').disabled = true;
-    document.getElementById('submit-btn').style.display = 'inline-flex';
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('finish-btn').style.display = 'none';
-    document.getElementById('feedback-container').style.display = 'none';
+    document.getElementById('submit-btn').classList.remove('hidden');
+    document.getElementById('next-btn').classList.add('hidden');
+    document.getElementById('finish-btn').classList.add('hidden');
+
+    // Hide feedback
+    document.getElementById('feedback-card').classList.add('hidden');
 }
 
-function selectOption(optionId) {
+function selectOption(optionId, optionCard) {
     if (answered) return;
 
     selectedOption = optionId;
 
-    document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.classList.remove('selected');
-        if (btn.dataset.optionId === optionId) {
-            btn.classList.add('selected');
-        }
+    // Update visual selection
+    document.querySelectorAll('.option-card').forEach(card => {
+        card.classList.remove('selected');
     });
+    optionCard.classList.add('selected');
 
+    // Enable submit button
     document.getElementById('submit-btn').disabled = false;
 }
 
@@ -102,6 +135,11 @@ async function submitAnswer(sessionId) {
 
     answered = true;
     const question = questions[currentIndex];
+
+    // Disable all options
+    document.querySelectorAll('.option-card').forEach(card => {
+        card.classList.add('disabled');
+    });
 
     try {
         const response = await fetch(`/api/quiz/submit/${sessionId}`, {
@@ -122,52 +160,74 @@ async function submitAnswer(sessionId) {
         // Update score
         if (result.is_correct) {
             score++;
+            progressDots[currentIndex].classList.add('completed');
+        } else {
+            progressDots[currentIndex].classList.add('wrong');
         }
         document.getElementById('current-score').textContent = score;
 
-        // Show feedback
-        const feedbackContainer = document.getElementById('feedback-container');
-        const feedbackStatus = document.getElementById('feedback-status');
-        const feedbackText = document.getElementById('feedback-text');
-        const understandingText = document.getElementById('understanding-text');
-
-        feedbackStatus.textContent = result.is_correct ? 'Correct!' : 'Incorrect';
-        feedbackStatus.className = 'feedback-status ' + (result.is_correct ? 'correct' : 'incorrect');
-        feedbackText.textContent = result.feedback;
-        understandingText.textContent = result.understanding;
-        feedbackContainer.style.display = 'block';
-
-        // Update option styles
-        document.querySelectorAll('.option-btn').forEach(btn => {
-            btn.classList.remove('selected');
-            const optionId = btn.dataset.optionId;
-
-            // Find correct answer
-            const correctOption = question.options.find(o => {
-                // We don't have is_correct in the frontend data, use API response
-                return optionId === selectedOption;
-            });
-
+        // Show correct/incorrect on options
+        document.querySelectorAll('.option-card').forEach(card => {
+            const optionId = card.dataset.optionId;
             if (optionId === selectedOption) {
-                btn.classList.add(result.is_correct ? 'correct' : 'incorrect');
+                card.classList.add(result.is_correct ? 'correct' : 'incorrect');
             }
         });
 
-        // Show next/finish button
-        document.getElementById('submit-btn').style.display = 'none';
+        // Show feedback
+        const feedbackCard = document.getElementById('feedback-card');
+        const feedbackStatus = document.getElementById('feedback-status');
+        const feedbackText = document.getElementById('feedback-text');
+        const feedbackIcon = document.getElementById('feedback-icon');
+
+        feedbackCard.classList.remove('hidden', 'correct', 'incorrect');
+        feedbackCard.classList.add(result.is_correct ? 'correct' : 'incorrect');
+
+        feedbackStatus.textContent = result.is_correct ? 'Correct!' : 'Incorrect';
+        feedbackText.textContent = result.feedback;
+
+        // Update icon
+        feedbackIcon.setAttribute('data-lucide', result.is_correct ? 'check-circle' : 'x-circle');
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        // Show appropriate next button
+        document.getElementById('submit-btn').classList.add('hidden');
         if (currentIndex < questions.length - 1) {
-            document.getElementById('next-btn').style.display = 'inline-flex';
+            document.getElementById('next-btn').classList.remove('hidden');
         } else {
-            document.getElementById('finish-btn').style.display = 'inline-flex';
+            document.getElementById('finish-btn').classList.remove('hidden');
+        }
+
+        // Re-init icons for buttons
+        if (window.lucide) {
+            lucide.createIcons();
         }
     } catch (error) {
         console.error('Submit error:', error);
-        alert('Error submitting answer. Please try again.');
+        if (window.Toast) {
+            Toast.error('Error submitting answer. Please try again.');
+        }
         answered = false;
+
+        // Re-enable options
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('disabled');
+        });
     }
 }
 
 function nextQuestion() {
     currentIndex++;
+
+    // Update progress dots
+    progressDots.forEach((dot, i) => {
+        dot.classList.remove('active');
+        if (i === currentIndex) {
+            dot.classList.add('active');
+        }
+    });
+
     renderQuestion();
 }

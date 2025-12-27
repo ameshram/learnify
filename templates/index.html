@@ -1,116 +1,179 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Learn Anything with AI{% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
 <section class="hero">
-    <div class="hero-content">
-        <h1 class="hero-title">Learn Anything with AI</h1>
-        <p class="hero-subtitle">Get personalized teaching on any topic, test your knowledge with interactive quizzes, and track your learning progress.</p>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
+                <span>Powered by Claude AI</span>
+            </div>
+            <h1 class="hero-title">Learn Anything,<br>Powered by AI</h1>
+            <p class="hero-subtitle">
+                Get personalized explanations on any topic, test your knowledge with interactive quizzes, and track your learning progress.
+            </p>
+        </div>
     </div>
 </section>
 
+<!-- Topic Input Section -->
 <section class="topic-section">
     <div class="container">
-        <div class="topic-card">
-            <h2>What do you want to learn?</h2>
-            <form id="learn-form" class="learn-form">
-                <div class="form-group">
-                    <input type="text" id="topic-input" name="topic"
-                           placeholder="e.g., Machine Learning, Quantum Physics, Python async/await..."
-                           class="topic-input" required autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Difficulty Level</label>
-                    <div class="difficulty-options">
-                        <label class="difficulty-option">
-                            <input type="radio" name="difficulty" value="beginner">
-                            <span class="difficulty-label">Beginner</span>
-                            <span class="difficulty-desc">Simple explanations, lots of examples</span>
-                        </label>
-                        <label class="difficulty-option">
-                            <input type="radio" name="difficulty" value="intermediate" checked>
-                            <span class="difficulty-label">Intermediate</span>
-                            <span class="difficulty-desc">Balanced theory and practice</span>
-                        </label>
-                        <label class="difficulty-option">
-                            <input type="radio" name="difficulty" value="advanced">
-                            <span class="difficulty-label">Advanced</span>
-                            <span class="difficulty-desc">Deep technical details</span>
-                        </label>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-large">
-                    <span class="btn-text">Start Learning</span>
-                    <span class="btn-icon">→</span>
+        <form id="learn-form" class="topic-form">
+            <!-- Search Input -->
+            <div class="search-input-wrapper">
+                <span class="input-icon">
+                    <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+                </span>
+                <input
+                    type="text"
+                    id="topic-input"
+                    name="topic"
+                    class="input search-input"
+                    placeholder="What do you want to learn today?"
+                    required
+                    autocomplete="off"
+                >
+            </div>
+
+            <!-- Difficulty Selector -->
+            <div class="difficulty-selector">
+                <label class="difficulty-pill">
+                    <input type="radio" name="difficulty" value="beginner">
+                    <span>Beginner</span>
+                </label>
+                <label class="difficulty-pill active">
+                    <input type="radio" name="difficulty" value="intermediate" checked>
+                    <span>Intermediate</span>
+                </label>
+                <label class="difficulty-pill">
+                    <input type="radio" name="difficulty" value="advanced">
+                    <span>Advanced</span>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-xl">
+                    <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                    <span>Start Learning</span>
                 </button>
-            </form>
-        </div>
+            </div>
+
+            <!-- Example Topics -->
+            <div class="example-topics">
+                <span class="example-chip" data-topic="Machine Learning basics">Machine Learning</span>
+                <span class="example-chip" data-topic="How does blockchain work">Blockchain</span>
+                <span class="example-chip" data-topic="Python async/await">Python Async</span>
+                <span class="example-chip" data-topic="Quantum computing explained">Quantum Computing</span>
+                <span class="example-chip" data-topic="REST API design">REST APIs</span>
+            </div>
+        </form>
     </div>
 </section>
 
-<section class="stats-section">
-    <div class="container">
-        <h2 class="section-title">Your Learning Stats</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{{ stats.total_sessions or 0 }}</div>
-                <div class="stat-label">Sessions Started</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ stats.completed_sessions or 0 }}</div>
-                <div class="stat-label">Quizzes Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ stats.average_score or 0 }}%</div>
-                <div class="stat-label">Average Score</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ stats.unique_topics or 0 }}</div>
-                <div class="stat-label">Topics Explored</div>
-            </div>
-        </div>
-    </div>
-</section>
-
+<!-- Features Section -->
 <section class="features-section">
     <div class="container">
-        <h2 class="section-title">How It Works</h2>
+        <div class="section-header">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Simple, effective learning in four steps</p>
+        </div>
+
         <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">📖</div>
-                <h3>1. Choose a Topic</h3>
-                <p>Enter any topic you want to learn about, from programming to physics.</p>
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="search" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h3 class="feature-title">Choose a Topic</h3>
+                <p class="feature-description">Enter any topic you want to learn about, from programming to physics.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎓</div>
-                <h3>2. Get Taught</h3>
-                <p>AI explains the topic in real-time with clear examples and analogies.</p>
+
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="book-open" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h3 class="feature-title">Get Taught</h3>
+                <p class="feature-description">AI explains the topic in real-time with clear examples and analogies.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📝</div>
-                <h3>3. Take a Quiz</h3>
-                <p>Test your understanding with adaptive questions and instant feedback.</p>
+
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="clipboard-check" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h3 class="feature-title">Take a Quiz</h3>
+                <p class="feature-description">Test your understanding with adaptive questions and instant feedback.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>4. Track Progress</h3>
-                <p>Review your learning journey and identify areas for improvement.</p>
+
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h3 class="feature-title">Track Progress</h3>
+                <p class="feature-description">Review your learning journey and identify areas for improvement.</p>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Stats Section (if available) -->
+{% if stats and stats.total_sessions > 0 %}
+<section class="container" style="padding: var(--space-16) 0;">
+    <div class="section-header">
+        <h2 class="section-title">Your Learning Stats</h2>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_sessions }}</div>
+            <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.completed_sessions }}</div>
+            <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.average_score }}%</div>
+            <div class="stat-label">Avg Score</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.unique_topics }}</div>
+            <div class="stat-label">Topics</div>
+        </div>
+    </div>
+</section>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script>
+// Form submission
 document.getElementById('learn-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const topic = document.getElementById('topic-input').value.trim();
     const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+
     if (topic) {
         window.location.href = `/teach?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`;
     }
+});
+
+// Difficulty pill selection
+document.querySelectorAll('.difficulty-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+        document.querySelectorAll('.difficulty-pill').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// Example topic chips
+document.querySelectorAll('.example-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+        document.getElementById('topic-input').value = this.dataset.topic;
+        document.getElementById('topic-input').focus();
+    });
 });
 </script>
 {% endblock %}

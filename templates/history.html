@@ -5,47 +5,52 @@
 {% block content %}
 <div class="history-page">
     <div class="container">
+        <!-- Header -->
         <header class="history-header">
-            <h1>Learning History</h1>
-            <p>Track your learning journey</p>
+            <h1 class="history-title">Learning History</h1>
+            <p class="history-subtitle">Track your learning journey and progress over time</p>
         </header>
 
-        <div id="stats-container" class="stats-container">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="total-sessions">-</div>
-                    <div class="stat-label">Total Sessions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="completed-quizzes">-</div>
-                    <div class="stat-label">Quizzes Completed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="average-score">-</div>
-                    <div class="stat-label">Average Score</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="unique-topics">-</div>
-                    <div class="stat-label">Topics Explored</div>
-                </div>
+        <!-- Stats Grid -->
+        <div id="stats-container" class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-sessions">-</div>
+                <div class="stat-label">Total Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completed-quizzes">-</div>
+                <div class="stat-label">Quizzes Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="average-score">-</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="unique-topics">-</div>
+                <div class="stat-label">Topics Explored</div>
             </div>
         </div>
 
-        <div id="history-loading" class="history-loading">
-            <div class="loading-spinner"></div>
-            <p>Loading history...</p>
+        <!-- Loading State -->
+        <div id="history-loading" class="loading-overlay">
+            <div class="spinner spinner-lg"></div>
+            <p class="loading-text">Loading your history...</p>
         </div>
 
-        <div id="history-empty" class="history-empty" style="display:none;">
-            <div class="empty-state">
-                <div class="empty-icon">📚</div>
-                <h2>No learning sessions yet</h2>
-                <p>Start your first lesson to begin tracking your progress.</p>
-                <a href="/" class="btn btn-primary">Start Learning</a>
-            </div>
+        <!-- Empty State (hidden initially) -->
+        <div id="history-empty" class="empty-state hidden">
+            <div class="empty-icon">📚</div>
+            <h2 class="empty-title">No learning sessions yet</h2>
+            <p class="empty-description">Start your first lesson to begin tracking your progress.</p>
+            <a href="/" class="btn btn-primary btn-lg">
+                <i data-lucide="play" style="width: 18px; height: 18px;"></i>
+                <span>Start Learning</span>
+            </a>
         </div>
 
-        <div id="history-list" class="history-list" style="display:none;">
+        <!-- History List (hidden initially) -->
+        <div id="history-list" class="history-list hidden">
+            <!-- Items will be generated dynamically -->
         </div>
     </div>
 </div>
@@ -54,11 +59,16 @@
 {% block scripts %}
 <script>
 async function loadHistory() {
+    const loadingEl = document.getElementById('history-loading');
+    const emptyEl = document.getElementById('history-empty');
+    const listEl = document.getElementById('history-list');
+
     try {
         const response = await fetch('/api/history');
         const data = await response.json();
 
-        document.getElementById('history-loading').style.display = 'none';
+        // Hide loading
+        loadingEl.classList.add('hidden');
 
         // Update stats
         const stats = data.stats;
@@ -68,17 +78,19 @@ async function loadHistory() {
         document.getElementById('unique-topics').textContent = stats.unique_topics;
 
         const sessions = data.sessions;
+
         if (sessions.length === 0) {
-            document.getElementById('history-empty').style.display = 'block';
+            emptyEl.classList.remove('hidden');
+            lucide.createIcons();
             return;
         }
 
-        const historyList = document.getElementById('history-list');
-        historyList.style.display = 'block';
+        // Populate list
+        listEl.classList.remove('hidden');
 
         sessions.forEach(session => {
-            const card = document.createElement('div');
-            card.className = 'history-card';
+            const item = document.createElement('div');
+            item.className = 'history-item animate-fade-in';
 
             const date = new Date(session.created_at);
             const formattedDate = date.toLocaleDateString('en-US', {
@@ -89,39 +101,50 @@ async function loadHistory() {
                 minute: '2-digit'
             });
 
-            let statusClass = 'status-incomplete';
-            let statusText = 'In Progress';
-            let scoreHtml = '';
+            let badgeClass = 'incomplete';
+            let badgeText = 'In Progress';
 
             if (session.completed_at) {
                 const pct = session.percentage || 0;
-                if (pct >= 80) statusClass = 'status-excellent';
-                else if (pct >= 60) statusClass = 'status-good';
-                else statusClass = 'status-needs-work';
-
-                statusText = `${session.score}/${session.total_questions} (${Math.round(pct)}%)`;
-                scoreHtml = `<div class="history-score ${statusClass}">${statusText}</div>`;
-            } else {
-                scoreHtml = `<div class="history-score ${statusClass}">${statusText}</div>`;
+                if (pct >= 80) {
+                    badgeClass = 'excellent';
+                } else if (pct >= 60) {
+                    badgeClass = 'good';
+                } else {
+                    badgeClass = 'needs-work';
+                }
+                badgeText = `${Math.round(pct)}%`;
             }
 
-            card.innerHTML = `
-                <div class="history-card-header">
-                    <h3 class="history-topic">${session.topic}</h3>
-                    <span class="history-difficulty">${session.difficulty}</span>
+            item.innerHTML = `
+                <div class="history-info">
+                    <div class="history-icon">
+                        <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <div class="history-details">
+                        <h3>${session.topic}</h3>
+                        <p>${formattedDate} • ${session.difficulty}</p>
+                    </div>
                 </div>
-                <div class="history-card-body">
-                    <div class="history-date">${formattedDate}</div>
-                    ${scoreHtml}
+                <div class="history-score">
+                    ${session.completed_at ? `<span>${session.score}/${session.total_questions}</span>` : ''}
+                    <span class="score-badge ${badgeClass}">${badgeText}</span>
                 </div>
             `;
 
-            historyList.appendChild(card);
+            listEl.appendChild(item);
         });
+
+        // Initialize icons
+        lucide.createIcons();
     } catch (error) {
         console.error('Error loading history:', error);
-        document.getElementById('history-loading').innerHTML =
-            '<p>Error loading history. Please try again.</p>';
+        loadingEl.innerHTML = `
+            <div style="text-align: center;">
+                <p style="color: var(--color-text-tertiary);">Error loading history. Please try again.</p>
+                <button onclick="loadHistory()" class="btn btn-secondary mt-4">Retry</button>
+            </div>
+        `;
     }
 }
 

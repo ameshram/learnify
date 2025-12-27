@@ -4,60 +4,93 @@
 
 {% block content %}
 <div class="teaching-page">
-    <header class="teaching-header">
+    <!-- Teaching Header -->
+    <div class="teaching-header">
         <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-separator">
+                    <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                </span>
+                <span class="breadcrumb-current">{{ topic }}</span>
+            </nav>
+
+            <!-- Meta -->
             <div class="teaching-meta">
-                <span class="teaching-badge">{{ difficulty | capitalize }}</span>
+                <span class="topic-badge">{{ difficulty }}</span>
                 <h1 class="teaching-title">{{ topic }}</h1>
             </div>
-            <div class="teaching-actions">
-                <button id="restart-btn" class="btn btn-secondary" style="display:none;">
-                    Restart
-                </button>
-            </div>
         </div>
-    </header>
+    </div>
 
-    <div class="teaching-container">
-        <div class="teaching-content-wrapper">
-            <div id="loading-indicator" class="loading-indicator">
-                <div class="loading-spinner"></div>
-                <p>Preparing your lesson...</p>
-            </div>
-
-            <article id="teaching-content" class="teaching-content markdown-body">
-            </article>
-
-            <div id="teaching-complete" class="teaching-complete" style="display:none;">
-                <div class="complete-card">
-                    <h2>Ready to test your knowledge?</h2>
-                    <p>Take a quick quiz to reinforce what you've learned.</p>
-                    <a id="quiz-link" href="#" class="btn btn-primary btn-large">
-                        Take Quiz
-                        <span class="btn-icon">→</span>
-                    </a>
+    <!-- Teaching Content -->
+    <div class="teaching-layout">
+        <!-- Main Content -->
+        <div class="teaching-main">
+            <!-- Loading State -->
+            <div id="loading-state" class="teaching-content">
+                <div class="loading-overlay">
+                    <div class="spinner spinner-lg"></div>
+                    <p class="loading-text">Preparing your personalized lesson...</p>
                 </div>
             </div>
+
+            <!-- Content Area (hidden initially) -->
+            <div id="content-area" class="teaching-content hidden">
+                <article id="teaching-content" class="markdown-body"></article>
+            </div>
+
+            <!-- Quiz CTA (hidden initially) -->
+            <div id="quiz-cta" class="sidebar-card quiz-cta hidden mt-6">
+                <h3>Ready to test your knowledge?</h3>
+                <p>Take a quick quiz to reinforce what you've learned.</p>
+                <a id="quiz-link" href="#" class="btn btn-secondary btn-full" style="background: white; color: var(--color-primary);">
+                    <i data-lucide="clipboard-check" style="width: 18px; height: 18px;"></i>
+                    <span>Take Quiz</span>
+                </a>
+            </div>
         </div>
 
+        <!-- Sidebar -->
         <aside class="teaching-sidebar">
+            <!-- Progress Card -->
             <div class="sidebar-card">
-                <h3>Topic Info</h3>
-                <dl class="info-list">
-                    <dt>Topic</dt>
-                    <dd>{{ topic }}</dd>
-                    <dt>Level</dt>
-                    <dd>{{ difficulty | capitalize }}</dd>
-                    <dt>Status</dt>
-                    <dd id="status-text">Loading...</dd>
-                </dl>
-            </div>
-            <div class="sidebar-card">
-                <h3>Progress</h3>
+                <h3 class="sidebar-title">Progress</h3>
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
                 </div>
                 <p id="progress-text" class="progress-text">Starting...</p>
+            </div>
+
+            <!-- Topic Info -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">Topic Info</h3>
+                <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">Topic</span>
+                        <span style="font-size: var(--text-sm); font-weight: 500;">{{ topic[:30] }}{% if topic|length > 30 %}...{% endif %}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">Level</span>
+                        <span style="font-size: var(--text-sm); font-weight: 500; text-transform: capitalize;">{{ difficulty }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">Status</span>
+                        <span id="status-text" style="font-size: var(--text-sm); font-weight: 500; color: var(--color-primary);">Generating...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                    <a href="/" class="btn btn-secondary btn-full btn-sm">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                        <span>New Topic</span>
+                    </a>
+                </div>
             </div>
         </aside>
     </div>

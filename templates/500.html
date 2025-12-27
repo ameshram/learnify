@@ -4,11 +4,14 @@
 
 {% block content %}
 <div class="error-page">
-    <div class="error-container">
+    <div class="error-content animate-scale-in">
         <div class="error-code">500</div>
-        <h1>Something Went Wrong</h1>
-        <p>We're experiencing technical difficulties. Please try again later.</p>
-        <a href="/" class="btn btn-primary">Go Home</a>
+        <h1 class="error-title">Something Went Wrong</h1>
+        <p class="error-description">We're experiencing technical difficulties. Please try again later.</p>
+        <a href="/" class="btn btn-primary btn-lg">
+            <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+            <span>Go Home</span>
+        </a>
     </div>
 </div>
 {% endblock %}
