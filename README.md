@@ -70,6 +70,13 @@ docker run -p 5000:5000 -e ANTHROPIC_API_KEY=your_key learnify
 
 The container serves with Gunicorn on port 5000.
 
+> **State & scaling:** active quiz/teaching session state is held in-process, so the
+> container runs a **single** Gunicorn worker (with multiple threads). Running more
+> than one worker would make the quiz submit/complete flow 404 non-deterministically,
+> because that state is not shared across processes. To scale to multiple
+> workers/replicas, move session state into a shared store (Redis, or the existing
+> SQLAlchemy database) first.
+
 ## Tech Stack
 
 - **Backend:** Flask, SQLAlchemy, Gunicorn
