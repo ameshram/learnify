@@ -1,6 +1,5 @@
 """Security utilities for Learnify"""
 import re
-import html
 import time
 import logging
 from functools import wraps
@@ -51,11 +50,14 @@ def rate_limit(f):
 
 
 def sanitize_input(text: str, max_length: int = 1000) -> str:
+    # The topic is JSON-encoded into the Claude API call and Jinja auto-escapes it
+    # on render, so HTML-escaping here would only corrupt legitimate input (e.g.
+    # 'R&D'). Instead: bound length, drop control characters, and collapse
+    # whitespace. validate_topic() rejects genuinely unsafe characters (<, >, …).
     if not text:
         return ""
     text = text[:max_length]
-    text = html.escape(text)
-    text = re.sub(r'[<>"\']', '', text)
+    text = ''.join(ch for ch in text if ch in '\t\n' or (ord(ch) >= 32 and ord(ch) != 127))
     text = ' '.join(text.split())
     return text.strip()
 
@@ -82,7 +84,7 @@ def validate_difficulty(difficulty: str) -> tuple[bool, str]:
 def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['X-XSS-Protection'] = '0'  # deprecated header; 0 is the modern, safe value
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
     return response

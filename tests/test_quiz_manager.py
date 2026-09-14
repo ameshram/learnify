@@ -85,3 +85,41 @@ def test_performance_analysis():
     assert analysis["percentage"] == 50.0
     assert any("concept-b" in w for w in analysis["weaknesses"])
     assert analysis["recommendations"]  # non-empty
+
+
+# --- _parse_quiz_response: the brittle model-output parsing path -----------
+
+_ONE_Q = ('{"questions":[{"id":1,"question":"Q?","concept_tested":"c","options":['
+          '{"id":"A","text":"a","is_correct":true,"feedback":"f","understanding":"u"},'
+          '{"id":"B","text":"b","is_correct":false,"feedback":"f","understanding":"u"}]}]}')
+
+
+def test_parse_quiz_response_clean_json():
+    mgr = QuizManager(claude_client=object())
+    quiz = mgr._parse_quiz_response("topic", _ONE_Q)
+    assert quiz.total == 1
+    assert quiz.questions[0].get_correct_option().id == "A"
+
+
+def test_parse_quiz_response_json_fenced():
+    mgr = QuizManager(claude_client=object())
+    quiz = mgr._parse_quiz_response("topic", f"```json\n{_ONE_Q}\n```")
+    assert quiz.total == 1
+
+
+def test_parse_quiz_response_plain_fenced():
+    mgr = QuizManager(claude_client=object())
+    quiz = mgr._parse_quiz_response("topic", f"```\n{_ONE_Q}\n```")
+    assert quiz.total == 1
+
+
+def test_parse_quiz_response_invalid_json_raises_valueerror():
+    mgr = QuizManager(claude_client=object())
+    with pytest.raises(ValueError):
+        mgr._parse_quiz_response("topic", "this is not json at all")
+
+
+def test_parse_quiz_response_missing_keys_raises_valueerror():
+    mgr = QuizManager(claude_client=object())
+    with pytest.raises(ValueError):
+        mgr._parse_quiz_response("topic", '{"questions":[{"id":1}]}')

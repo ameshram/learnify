@@ -7,11 +7,15 @@ from security import (
 )
 
 
-def test_sanitize_input_strips_markup_but_keeps_text():
-    result = sanitize_input("<script>alert('xss')</script>")
-    assert "<" not in result
-    assert ">" not in result
-    assert "script" in result  # text content survives, raw markup does not
+def test_sanitize_input_preserves_ampersand_and_quotes():
+    # sanitize no longer HTML-escapes, so legitimate text is preserved verbatim
+    # (e.g. 'R&D'); validate_topic() is the layer that rejects unsafe characters.
+    assert sanitize_input("R&D in AI/ML") == "R&D in AI/ML"
+    assert "'" in sanitize_input("it's fine")
+
+
+def test_sanitize_input_strips_control_characters():
+    assert sanitize_input("hello\x00\x07world") == "helloworld"
 
 
 def test_sanitize_input_truncates_to_max_length():

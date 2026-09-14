@@ -4,7 +4,6 @@ import uuid
 import json
 import logging
 from flask import Flask, render_template, request, jsonify, Response
-from flask_cors import CORS
 from config import get_config
 from claude_client import ClaudeClient
 from teaching_service import TeachingService
@@ -19,7 +18,6 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 config = get_config()
 app.secret_key = config.SECRET_KEY
-CORS(app)
 
 claude_client = ClaudeClient()
 teaching_service = TeachingService(claude_client)
