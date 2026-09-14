@@ -5,7 +5,7 @@ import time
 import logging
 from functools import wraps
 from collections import defaultdict
-from flask import request, jsonify, g
+from flask import request, jsonify
 
 logger = logging.getLogger(__name__)
 

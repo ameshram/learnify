@@ -1,0 +1,13 @@
+# Tooling configuration only — Learnify is run as a Flask app, not installed as a package.
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]  # long lines are almost all prompt strings in prompt_templates.py
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

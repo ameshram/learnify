@@ -3,11 +3,11 @@ import os
 import uuid
 import json
 import logging
-from flask import Flask, render_template, request, jsonify, Response, session
+from flask import Flask, render_template, request, jsonify, Response
 from flask_cors import CORS
 from config import get_config
 from claude_client import ClaudeClient
-from teaching_agent import TeachingAgent
+from teaching_service import TeachingService
 from quiz_manager import QuizManager
 from session_manager import SessionManager
 from prompt_templates import InsightsPrompts
@@ -22,7 +22,7 @@ app.secret_key = config.SECRET_KEY
 CORS(app)
 
 claude_client = ClaudeClient()
-teaching_agent = TeachingAgent(claude_client)
+teaching_service = TeachingService(claude_client)
 quiz_manager = QuizManager(claude_client)
 session_manager = SessionManager()
 
@@ -69,7 +69,7 @@ def api_teach():
     def generate():
         content_parts = []
         try:
-            for chunk in teaching_agent.teach(topic, difficulty):
+            for chunk in teaching_service.teach(topic, difficulty):
                 content_parts.append(chunk)
                 yield f"data: {json.dumps({'content': chunk})}\n\n"
 
