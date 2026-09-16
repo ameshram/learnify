@@ -1,4 +1,4 @@
-"""Tests for security utilities — sanitization, validation, rate limiting."""
+"""Tests for security utilities - sanitization, validation, rate limiting."""
 from security import (
     RateLimiter,
     sanitize_input,

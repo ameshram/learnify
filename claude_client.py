@@ -22,7 +22,7 @@ class ClaudeClient:
     def stream_teaching_content(self, system_prompt: str, user_prompt: str, model: Optional[str] = None) -> Generator[str, None, None]:
         # Errors are intentionally NOT swallowed here. On an API failure this
         # raises, so the caller (app.py: generate()) emits an SSE `error` event
-        # and skips persisting the failure — otherwise an error string would be
+        # and skips persisting the failure - otherwise an error string would be
         # saved as the "lesson" and the quiz generated from it.
         model = model or self.default_model
         logger.info(f"Streaming with model: {model}")

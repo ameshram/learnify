@@ -4,7 +4,7 @@ A thin wrapper around a single streaming Claude call: it turns a
 (topic, difficulty) pair into a structured explanation and streams the tokens
 back to the caller.
 
-Deliberately NOT an "agent" — there is no tool use, planning, memory, or
+Deliberately NOT an "agent" - there is no tool use, planning, memory, or
 multi-step control loop here, just one model call behind a small interface.
 The name reflects that.
 """

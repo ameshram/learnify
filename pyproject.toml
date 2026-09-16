@@ -1,4 +1,4 @@
-# Tooling configuration only — Learnify is run as a Flask app, not installed as a package.
+# Tooling configuration only - Learnify is run as a Flask app, not installed as a package.
 
 [tool.ruff]
 line-length = 120

@@ -1,4 +1,4 @@
-"""Tests for prompt_templates — pure prompt construction, no API calls."""
+"""Tests for prompt_templates - pure prompt construction, no API calls."""
 from prompt_templates import InsightsPrompts, QuizPrompts, TeachingPrompts
 
 

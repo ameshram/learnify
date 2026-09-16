@@ -2,15 +2,15 @@
 
 An AI-powered teaching web app built with Flask and the Anthropic Claude API. Give it a topic and a difficulty level; it streams a structured, "aha-moment" explanation, then generates an adaptive quiz with per-option feedback and personalized study insights.
 
-> **Scope note (honest framing):** Learnify is a straightforward LLM *application* — each feature is a single, well-prompted Claude call (teach → quiz → insights). It is **not** an autonomous agent: there is no tool use, planning, or multi-step control loop. The code is named to reflect that (see `teaching_service.py`).
+> **Scope note (honest framing):** Learnify is a straightforward LLM *application* - each feature is a single, well-prompted Claude call (teach → quiz → insights). It is **not** an autonomous agent: there is no tool use, planning, or multi-step control loop. The code is named to reflect that (see `teaching_service.py`).
 
 ## Features
 
-- **Streaming explanations** — real-time token streaming over Server-Sent Events
-- **Adaptive quizzes** — Claude generates 4-option questions, each with feedback and the concept it tests
-- **Performance insights** — score breakdown, concept-level strengths/weaknesses, study recommendations
-- **Session history** — SQLite-backed history and aggregate stats
-- **Input hardening** — rate limiting, input sanitization/validation, and security headers on every response
+- **Streaming explanations** - real-time token streaming over Server-Sent Events
+- **Adaptive quizzes** - Claude generates 4-option questions, each with feedback and the concept it tests
+- **Performance insights** - score breakdown, concept-level strengths/weaknesses, study recommendations
+- **Session history** - SQLite-backed history and aggregate stats
+- **Input hardening** - rate limiting, input sanitization/validation, and security headers on every response
 
 ## Architecture
 
@@ -48,18 +48,18 @@ ruff check .
 pytest -q
 ```
 
-GitHub Actions runs ruff + pytest on every push and pull request — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+GitHub Actions runs ruff + pytest on every push and pull request - see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Configuration
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | — | **Required.** Your Claude API key. |
+| `ANTHROPIC_API_KEY` | - | **Required.** Your Claude API key. |
 | `DEFAULT_MODEL` | `claude-sonnet-5` | Model used for all calls. |
 | `MAX_TOKENS_TEACHING` | `4096` | Max output tokens for explanations. |
 | `MAX_TOKENS_QUIZ` | `2048` | Max output tokens for quiz generation. |
 | `DATABASE_URL` | `sqlite:///learnify.db` | SQLAlchemy connection string. |
-| `SECRET_KEY` | `dev-secret-key` | Flask secret — set a real value in production. |
+| `SECRET_KEY` | `dev-secret-key` | Flask secret - set a real value in production. |
 
 ## Deployment (Docker)
 
@@ -87,4 +87,4 @@ The container serves with Gunicorn on port 5000.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). © 2026 Anup Meshram.
+MIT - see [LICENSE](LICENSE). © 2026 Anup Meshram.

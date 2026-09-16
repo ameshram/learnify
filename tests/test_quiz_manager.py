@@ -1,4 +1,4 @@
-"""Tests for quiz scoring and analysis — pure logic, no API calls.
+"""Tests for quiz scoring and analysis - pure logic, no API calls.
 
 QuizManager is constructed with a dummy client so no ANTHROPIC_API_KEY or real
 ClaudeClient is needed; the methods under test never touch the client.
@@ -45,7 +45,7 @@ def test_empty_quiz_percentage_is_zero():
 
 def test_scoring_and_completion():
     quiz = _make_quiz()
-    mgr = QuizManager(claude_client=object())  # dummy — no ClaudeClient constructed
+    mgr = QuizManager(claude_client=object())  # dummy - no ClaudeClient constructed
 
     assert quiz.total == 2
     assert quiz.score == 0
