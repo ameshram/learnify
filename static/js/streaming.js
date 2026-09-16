@@ -93,15 +93,26 @@ async function initTeaching(topic, difficulty) {
                             throw new Error(data.error);
                         }
                     } catch (e) {
-                        if (e.message !== 'Unexpected end of JSON input') {
-                            console.error('Parse error:', e);
+                        // Incomplete JSON: an SSE data line was split across chunk
+                        // reads. Skip this fragment; a later read completes it.
+                        if (e instanceof SyntaxError) {
+                            continue;
                         }
+                        // A server-sent error (thrown from data.error above) is a
+                        // real failure - re-throw so the outer catch renders the
+                        // visible error UI instead of leaving the page stuck.
+                        throw e;
                     }
                 }
             }
         }
     } catch (error) {
         console.error('Teaching error:', error);
+
+        // Streaming hid the loading panel (and showed the empty content area);
+        // restore it so the error message below is actually visible.
+        contentArea.classList.add('hidden');
+        loadingState.classList.remove('hidden');
 
         loadingState.innerHTML = `
             <div style="text-align: center; padding: var(--space-8);">
